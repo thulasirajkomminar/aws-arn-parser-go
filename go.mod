@@ -1,5 +1,5 @@
-module github.com/thulasirajkomminar/aws-arn-parser
+module github.com/thulasirajkomminar/aws-arn-parser-go
 
-go 1.24.3
+go 1.26
 
-require github.com/aws/aws-sdk-go-v2 v1.36.5 // indirect
+require github.com/aws/aws-sdk-go-v2 v1.41.7

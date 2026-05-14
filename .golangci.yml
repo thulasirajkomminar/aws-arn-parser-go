@@ -1,0 +1,239 @@
+version: "2"
+run:
+  timeout: 10m
+  concurrency: 3
+  issues-exit-code: 1
+  tests: true
+linters:
+  default: all
+  disable:
+    - exhaustruct
+    - varnamelen
+  settings:
+    tagalign:
+      order:
+        - json
+        - yaml
+        - yml
+        - toml
+        - mapstructure
+        - binding
+        - validate
+        - db
+        - gorm
+    forbidigo:
+      # parsing type info allows forbidigo to handle package aliases (e.g. import e "errors")
+      analyze-types: true
+      forbid:
+        - pattern: ^errors\.As$
+          pkg: ^errors$
+          msg: "Use errors.AsType instead (available since Go 1.26)"
+    depguard:
+      rules:
+        e2e:
+          files:
+            - "**e2e/*.go"
+            - "**e2e/**/*.go"
+          deny:
+            - pkg: github.com/stretchr/testify/assert
+              desc: use the suite.Assert functionality
+            - pkg: github.com/stretchr/testify/require
+              desc: use the suite.Require functionality
+        component:
+          files:
+            - "**apps/**/tests/*.go"
+          deny:
+            - pkg: github.com/stretchr/testify/assert
+              desc: use the suite.Assert functionality
+            - pkg: github.com/stretchr/testify/require
+              desc: use the suite.Require functionality
+        main:
+          deny:
+            - pkg: github.com/tj/assert
+              desc: not allowed, did you mean testify assert?
+            - pkg: reflect
+              desc: please don't use reflect package
+            - pkg: github.com/gofrs/uuid
+              desc: please use github.com/google/uuid
+        pkg:
+          files:
+            - "**pkg/*.go"
+            - "**pkg/**/*.go"
+          deny:
+            - pkg: "**/internal/**/*.go"
+              desc: pkg should not depend on internal
+        repository:
+          files:
+            - "**repository/*.go"
+            - "**repository/**/*.go"
+          deny:
+            - pkg: "**/internal/**/*.go"
+              desc: repository should not depend on app
+    dupl:
+      threshold: 175
+    errcheck:
+      check-type-assertions: false
+    funlen:
+      lines: 80
+      statements: 50
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    gocritic:
+      disabled-checks:
+        - regexpMust
+      enabled-tags:
+        - performance
+      settings:
+        captLocal:
+          paramsOnly: true
+        rangeValCopy:
+          sizeThreshold: 128
+    gocyclo:
+      min-complexity: 18
+    godox:
+      keywords:
+        - HACK
+        - OPTIMIZE
+        - TODO
+        - BUG
+    lll:
+      line-length: 200
+      tab-width: 2
+    misspell:
+      locale: UK
+      extra-words:
+        - typo: authorised
+          correction: authorized
+        - typo: authorisation
+          correction: authorization
+      ignore-rules:
+        - materialized
+        - analyze
+        - color
+        - center
+        - centers
+        - initializes
+        - organization
+        - liter
+        - milliliter
+        - unauthorized
+    prealloc:
+      simple: true
+      range-loops: true
+      for-loops: false
+    revive:
+      enable-all-rules: true
+      rules:
+        - name: var-naming
+          arguments:
+            - - ID
+            - []
+          severity: warning
+          disabled: false
+        - name: max-public-structs
+          disabled: true
+        - name: cognitive-complexity
+          arguments:
+            - 15
+          disabled: false
+        - name: unused-receiver
+          disabled: true
+        - name: function-length
+          arguments:
+            - 30
+            - 0
+          disabled: false
+        - name: line-length-limit
+          disabled: true
+        - name: cyclomatic
+          arguments:
+            - 7
+          disabled: false
+        - name: function-result-limit
+          arguments:
+            - 4
+          severity: warning
+          disabled: false
+        - name: add-constant
+          arguments:
+            - maxLitCount: "3"
+              allowStrs: '""'
+              allowInts: "0,1"
+              allowFloats: ""
+          disabled: false
+        - name: import-alias-naming
+          arguments:
+            - ^[a-z][a-z0-9A-Z]{0,}$
+          severity: warning
+          disabled: false
+    unparam:
+      check-exported: false
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - revive
+          - mnd
+          - gochecknoglobals
+          - funlen
+        path: internal/seed/seed.go
+      - linters:
+          - gocritic
+          - mnd
+        path: _mock\.go
+      - linters:
+          - dupl
+          - err113
+          - errcheck
+          - funlen
+          - gocritic
+          - gocyclo
+          - gosec
+          - maintidx
+          - musttag
+          - revive
+          - testpackage
+          - unused
+        path: _test\.go
+      - linters:
+          - staticcheck
+        text: "SA9003:"
+      - linters:
+          - lll
+        text: "^//go:generate "
+      - linters:
+          - godot
+          - dupword
+        source: "^// @"
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  uniq-by-line: false
+  new: false
+severity:
+  default: error
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/thulasirajkomminar/aws-arn-parser-go)
+    gofmt:
+      simplify: true
+  exclusions:
+    generated: disable
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
