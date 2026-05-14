@@ -1,0 +1,38 @@
+---
+version: 3
+vars:
+  REMOTE_URL: https://raw.githubusercontent.com
+  REMOTE_URL_REF: v3.11.15
+  REMOTE_URL_REPO: schubergphilis/mcvs-golang-action
+includes:
+  remote:
+    taskfile: >-
+      {{.REMOTE_URL}}/{{.REMOTE_URL_REPO}}/{{.REMOTE_URL_REF}}/build/task.yml
+    vars:
+      GOLANGCI_LINT_RUN_TIMEOUT_MINUTES: 10
+
+tasks:
+  fix:
+    desc: Auto-fix lint and format issues
+    cmds:
+      - task: tagalign
+      - task: remote:format
+
+  tagalign:
+    desc: Check struct tags alignment
+    env:
+      GOTOOLCHAIN: go1.26.1+auto
+    cmd: go run github.com/4meepo/tagalign/cmd/tagalign@latest -fix -order "json,yaml,yml,toml,mapstructure,binding,validate,db,gorm" ./...
+
+  api:
+    desc: Run Go API server
+    cmd: go run ./cmd/api
+
+  default:
+    desc: Run all backend and frontend checks
+    cmds:
+      - task: tagalign
+      - task: remote:format
+      - task: remote:lint
+      - task: remote:opa
+      - task: remote:test

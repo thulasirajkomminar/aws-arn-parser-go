@@ -1,0 +1,42 @@
+name: Golang CI
+
+on: pull_request
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  mcvs-golang-action:
+    strategy:
+      matrix:
+        args:
+          - testing-type: lint
+            build-tags: component
+          - testing-type: lint
+            build-tags: e2e
+          - testing-type: lint
+            build-tags: integration
+          - testing-type: opa
+          - testing-type: security-golang-modules
+          - testing-type: unit
+    runs-on: ubuntu-24.04
+    env:
+      TASK_X_REMOTE_TASKFILES: 1
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - name: Pre-install golangci-lint (works around upstream install.sh SBOM glob bug)
+        run: |
+          set -euo pipefail
+          VERSION=2.12.2
+          TARBALL="golangci-lint-${VERSION}-linux-amd64.tar.gz"
+          curl -sSfL "https://github.com/golangci/golangci-lint/releases/download/v${VERSION}/${TARBALL}" -o /tmp/glc.tar.gz
+          tar -xzf /tmp/glc.tar.gz -C /tmp
+          sudo mv "/tmp/golangci-lint-${VERSION}-linux-amd64/golangci-lint" /usr/local/bin/golangci-lint
+          golangci-lint --version
+      - uses: schubergphilis/mcvs-golang-action@v3.11.15
+        with:
+          build-tags: ${{ matrix.args.build-tags }}
+          code-coverage-opa-expected: 100.00
+          github-token-for-downloading-private-go-modules: ${{ secrets.GITHUB_TOKEN }}
+          testing-type: ${{ matrix.args.testing-type }}
