@@ -1,8 +1,15 @@
 {
+  "redirects": [
+    {
+      "source": "/api/parse_arn",
+      "destination": "/api/parse-arn",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
-      "source": "/parse-arn",
-      "destination": "/api/parse-arn"
+      "source": "/api/parse-arn",
+      "destination": "/api/parse_arn"
     }
   ]
 }

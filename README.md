@@ -77,7 +77,7 @@ func main() {
 
 ## HTTP API
 
-**GET** `/parse-arn?arn={ARN}&strict={true|false}`
+**GET** `/api/parse-arn?arn={ARN}&strict={true|false}`
 
 - `arn` (required): the ARN to parse.
 - `strict` (optional, default `true`): when `true`, runs service-aware validation; when `false`, only structural validation.
@@ -128,7 +128,7 @@ go run ./cmd/api
 task api
 ```
 
-Opens on `http://localhost:8080` — UI at `/`, API at `/parse-arn`. Honors a `PORT` env var. Run from the project root so `index.html` resolves correctly.
+Opens on `http://localhost:8080` — UI at `/`, API at `/api/parse-arn`. Honors a `PORT` env var. Run from the project root so `index.html` resolves correctly.
 
 ## Wildcards
 
@@ -146,7 +146,7 @@ Per the [AWS IAM ARN reference](https://docs.aws.amazon.com/IAM/latest/UserGuide
 
 ## Deployment
 
-The repo is wired up for Vercel: each file under `api/*.go` becomes a serverless function whose path matches its filename (so `api/parse-arn.go` → `/api/parse-arn`). `index.html` is auto-served at `/`.
+The repo is wired up for Vercel: each file under `api/*.go` becomes a serverless function. The source file is `api/parse_arn.go` (Go's convention is underscores in filenames) and [vercel.json](vercel.json) rewrites the public `/api/parse-arn` URL onto it, and 308-redirects the auto-generated `/api/parse_arn` path to the canonical hyphenated form. `index.html` is auto-served at `/`.
 
 ## Service coverage in strict mode
 

@@ -61,7 +61,6 @@ func run() error {
 
 func newServer(port string) *http.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/parse-arn", api.Handler)
 	mux.HandleFunc("/api/parse-arn", api.Handler)
 	mux.HandleFunc("/", serveIndex)
 
@@ -87,7 +86,7 @@ func serveIndex(w http.ResponseWriter, r *http.Request) {
 
 func listen(srv *http.Server, port string, errCh chan<- error) {
 	fmt.Printf("Server starting on :%s\n", port)
-	fmt.Printf("Try: http://localhost:%s/parse-arn?arn=arn:aws:s3:::my-bucket/folder/file.txt\n", port)
+	fmt.Printf("Try: http://localhost:%s/api/parse-arn?arn=arn:aws:s3:::my-bucket/folder/file.txt\n", port)
 
 	err := srv.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
