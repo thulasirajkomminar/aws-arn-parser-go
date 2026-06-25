@@ -34,7 +34,7 @@ jobs:
           tar -xzf /tmp/glc.tar.gz -C /tmp
           sudo mv "/tmp/golangci-lint-${VERSION}-linux-amd64/golangci-lint" /usr/local/bin/golangci-lint
           golangci-lint --version
-      - uses: schubergphilis/mcvs-golang-action@v3.11.21
+      - uses: schubergphilis/mcvs-golang-action@v3.11.22
         with:
           build-tags: ${{ matrix.args.build-tags }}
           code-coverage-opa-expected: 100.00
