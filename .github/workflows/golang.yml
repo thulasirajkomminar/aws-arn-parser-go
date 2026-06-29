@@ -24,7 +24,7 @@ jobs:
     env:
       TASK_X_REMOTE_TASKFILES: 1
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7
       - name: Pre-install golangci-lint (works around upstream install.sh SBOM glob bug)
         run: |
           set -euo pipefail
